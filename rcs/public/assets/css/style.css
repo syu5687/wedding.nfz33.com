@@ -27,6 +27,27 @@
 
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+
+/* === 数字表示の統一 === */
+/* Cormorant Garamond / Cinzel はデフォルトでoldstyle figures (高さがバラバラの数字) */
+/* lining-nums: 高さ統一 / tabular-nums: 幅統一（カウントダウン等で必須） */
+body, input, select, textarea, button{
+  font-feature-settings: "lnum" 1, "tnum" 0;
+  font-variant-numeric: lining-nums;
+}
+/* カウントダウンや並ぶ数字は等幅化 */
+.urgency-bar .countdown,
+.estimate-price-final,
+.estimate-monthly,
+.offer-percent,
+.form-tel-num,
+.hero-trust-num,
+.team-experience,
+.realtime-bar b{
+  font-feature-settings: "lnum" 1, "tnum" 1;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
 body{
   font-family:var(--f-jp);
   color:var(--c-ink);
