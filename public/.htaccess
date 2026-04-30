@@ -1,0 +1,34 @@
+# ===========================================
+# Le Diaphane - .htaccess
+# ===========================================
+
+# === デフォルトドキュメント ===
+DirectoryIndex index.html
+
+# === エラーページ ===
+ErrorDocument 404 /404.html
+
+# === URL正規化 (末尾スラッシュ・index.html隠蔽) ===
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	
+	# index.html を隠蔽 (https://example.com/index.html → https://example.com/)
+	RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /(.*)index\.html\ HTTP/
+	RewriteRule ^(.*)index\.html$ /$1 [R=301,L]
+	
+	# 末尾スラッシュ統一 (なし → ありに正規化、/assets/は除外)
+	# 必要に応じて有効化
+</IfModule>
+
+# === MIME types ===
+<IfModule mod_mime.c>
+	AddType image/svg+xml .svg
+	AddType image/webp .webp
+	AddType font/woff .woff
+	AddType font/woff2 .woff2
+</IfModule>
+
+# === セキュリティ: 隠しファイル拒否 ===
+<FilesMatch "^\.">
+	Require all denied
+</FilesMatch>
