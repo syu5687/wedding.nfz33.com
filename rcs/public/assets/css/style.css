@@ -139,7 +139,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 }
 .hero::before{
   content:'';position:absolute;inset:0;
-  background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/top.png');
+  background-image:url('../images/hero_nightgarden.jpg');
   background-size:cover;background-position:center;
   opacity:.55;
 }
@@ -381,10 +381,10 @@ section{padding:80px 20px;position:relative}
   position:relative;overflow:hidden;
   transition:all .5s;
 }
-.gallery-item:nth-child(1){background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/koda003-3.png')}
-.gallery-item:nth-child(2){background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/merit001.png')}
-.gallery-item:nth-child(3){background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/koda004-1.png')}
-.gallery-item:nth-child(4){background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/koda003-2.png')}
+.gallery-item:nth-child(1){background-image:url('../images/gallery_01.jpg')}
+.gallery-item:nth-child(2){background-image:url('../images/gallery_02.jpg')}
+.gallery-item:nth-child(3){background-image:url('../images/gallery_03.jpg')}
+.gallery-item:nth-child(4){background-image:url('../images/gallery_04.jpg')}
 .gallery-item::after{
   content:'';position:absolute;inset:0;
   background:rgba(42,36,29,0);transition:background .3s;
@@ -528,9 +528,9 @@ section{padding:80px 20px;position:relative}
   height:200px;background-size:cover;background-position:center;
   position:relative;
 }
-.fair-img:nth-of-type(1){background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/fair001.png')}
-.fair-card:nth-child(1) .fair-img{background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/koda003-1.png')}
-.fair-card:nth-child(2) .fair-img{background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/koda004.png')}
+.fair-img:nth-of-type(1){background-image:url('../images/gallery_02.jpg')}
+.fair-card:nth-child(1) .fair-img{background-image:url('../images/gallery_02.jpg')}
+.fair-card:nth-child(2) .fair-img{background-image:url('../images/gallery_04.jpg')}
 .fair-tag{
   position:absolute;top:16px;left:16px;
   background:var(--c-gold);color:#fff;
@@ -1144,12 +1144,12 @@ section{padding:80px 20px;position:relative}
   background:rgba(42,36,29,0);transition:background .3s;
 }
 .insta-item:hover::after{background:rgba(42,36,29,.4)}
-.insta-item:nth-child(1){background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/koda003-3.png')}
-.insta-item:nth-child(2){background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/merit001.png')}
-.insta-item:nth-child(3){background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/koda004-1.png')}
-.insta-item:nth-child(4){background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/koda003-2.png')}
-.insta-item:nth-child(5){background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/koda003-1.png')}
-.insta-item:nth-child(6){background-image:url('https://bridal-campaign.web.app/rcs_lediafane/_assets/img/top.png')}
+.insta-item:nth-child(1){background-image:url('../images/gallery_01.jpg')}
+.insta-item:nth-child(2){background-image:url('../images/gallery_02.jpg')}
+.insta-item:nth-child(3){background-image:url('../images/gallery_03.jpg')}
+.insta-item:nth-child(4){background-image:url('../images/gallery_04.jpg')}
+.insta-item:nth-child(5){background-image:url('../images/gallery_02.jpg')}
+.insta-item:nth-child(6){background-image:url('../images/hero_nightgarden.jpg')}
 .insta-cta{
   text-align:center;margin-top:32px;
 }
