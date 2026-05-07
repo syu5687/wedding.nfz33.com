@@ -1,22 +1,28 @@
 <?php
 /**
- * Le Diaphane LP リバースプロキシ
+ * Memolead Wedding LP - リバースプロキシ
  * 
- * rc-saga.jp/lp/lp1/ → Cloud Run へリクエストを転送
+ * rc-saga.jp/rcs/lp/lp1/ → Cloud Run /rcs/lp/lp1/ へリクエストをパススルー転送
  * 
- * 設置場所: rc-saga.jp の /lp/lp1/index.php (.htaccess と一緒に)
- * 
- * 必要な設定:
- *   1. CLOUD_RUN_URL を実際のCloud Run URLに変更
- *   2. 共有サーバでcURL拡張が有効になっていることを確認
+ * 設置場所例: rc-saga.jp/rcs/lp/lp1/index.php (.htaccess と一緒に)
+ *
+ * 動作モード:
+ *   PROXY_PATH と Cloud Run側のパスを「同じ」にすればパススルー転送
+ *   違うパスにマップしたい場合は CLOUD_RUN_PATH_PREFIX を変更
  */
 
 // =================================================
 // 設定
 // =================================================
-const CLOUD_RUN_URL = 'https://lediafane-lp-XXXXXXXXXX-an.a.run.app';
-const PROXY_PATH = '/lp/lp1';  // このプロキシが配置されるパス
-const TIMEOUT = 30;             // タイムアウト秒数
+const CLOUD_RUN_URL = 'https://wedding-nfz33-com-665477084949.asia-northeast1.run.app';
+
+// rc-saga.jp 上のこのプロキシのパス (この値を含むURIをCloud Runへ転送)
+const PROXY_PATH = '/rcs/lp/lp1';
+
+// Cloud Run側のパスプレフィックス (基本はPROXY_PATHと同じでOK)
+const CLOUD_RUN_PATH_PREFIX = '/rcs/lp/lp1';
+
+const TIMEOUT = 30;
 
 // =================================================
 // リクエストパスの解析
@@ -25,9 +31,10 @@ $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $path = parse_url($requestUri, PHP_URL_PATH);
 $query = parse_url($requestUri, PHP_URL_QUERY);
 
-// /lp/lp1/xxx → /xxx に変換 (Cloud Run側のルートを参照)
+// /rcs/lp/lp1/xxx → CLOUD_RUN_PATH_PREFIX/xxx に変換
 if (strpos($path, PROXY_PATH) === 0) {
-    $path = substr($path, strlen(PROXY_PATH));
+    $relPath = substr($path, strlen(PROXY_PATH));
+    $path = CLOUD_RUN_PATH_PREFIX . $relPath;
 }
 if ($path === '' || $path === false) {
     $path = '/';
@@ -59,21 +66,18 @@ $forwardHeaders = [];
 foreach ($_SERVER as $key => $value) {
     if (strpos($key, 'HTTP_') === 0) {
         $headerName = str_replace('_', '-', substr($key, 5));
-        // ホスト系・接続系ヘッダーは除外
         if (in_array(strtoupper($headerName), ['HOST', 'CONNECTION', 'CONTENT-LENGTH'])) {
             continue;
         }
         $forwardHeaders[] = $headerName . ': ' . $value;
     }
 }
-// プロキシ識別ヘッダー
 $forwardHeaders[] = 'X-Forwarded-For: ' . ($_SERVER['REMOTE_ADDR'] ?? '');
 $forwardHeaders[] = 'X-Forwarded-Proto: ' . (!empty($_SERVER['HTTPS']) ? 'https' : 'http');
 $forwardHeaders[] = 'X-Forwarded-Host: ' . ($_SERVER['HTTP_HOST'] ?? '');
 
 curl_setopt($ch, CURLOPT_HTTPHEADER, $forwardHeaders);
 
-// POSTデータ転送
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $postData = file_get_contents('php://input');
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
@@ -90,14 +94,13 @@ if ($response === false) {
 
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 $rawHeaders = substr($response, 0, $headerSize);
 $body = substr($response, $headerSize);
 
 curl_close($ch);
 
 // =================================================
-// レスポンスヘッダー転送（一部除外）
+// レスポンスヘッダー転送
 // =================================================
 http_response_code($httpCode);
 
@@ -107,7 +110,4 @@ foreach (explode("\r\n", $rawHeaders) as $headerLine) {
     header($headerLine, false);
 }
 
-// =================================================
-// レスポンスボディ送信
-// =================================================
 echo $body;

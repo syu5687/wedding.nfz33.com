@@ -1,33 +1,26 @@
 # ===================================
-# Le Diaphane LP - リバースプロキシ
-# 設置場所: rc-saga.jp/lp/lp1/.htaccess
+# Memolead Wedding LP - リバースプロキシ
+# 設置場所: rc-saga.jp/rcs/lp/lp1/.htaccess
 # ===================================
 
-# PHPのバッファリング無効化（大きなレスポンス用）
 <IfModule mod_php.c>
     php_flag output_buffering Off
 </IfModule>
 
-# 全てのリクエストを index.php に流す
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /lp/lp1/
+    RewriteBase /rcs/lp/lp1/
     
-    # 既存の物理ファイルやディレクトリは除外しない（全部プロキシ経由）
-    # ただし index.php 自体はそのまま
     RewriteCond %{REQUEST_FILENAME} !index\.php$
     RewriteRule ^(.*)$ index.php [QSA,L]
 </IfModule>
 
-# Apacheデフォルトのキャッシュ設定（プロキシ転送先にも依存）
 <IfModule mod_headers.c>
-    # HTMLは毎回最新を取得
     <FilesMatch "\.(html|htm|php)$">
         Header set Cache-Control "no-cache, no-store, must-revalidate"
     </FilesMatch>
 </IfModule>
 
-# .env や .git などの隠しファイル拒否
 <FilesMatch "^\.">
     Require all denied
 </FilesMatch>

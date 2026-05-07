@@ -1,54 +1,68 @@
-# Le Diaphane (Royal Chester Saga) - Landing Page
+# Memolead Wedding LP Hub
 
-ル・ディアファーヌ ブライダルキャンペーンLP / Cloud Run デプロイ用パッケージ
+メモリードグループ ブライダル施設のランディングページ集約サーバ。  
+**1つのCloud Runで複数施設・複数LPをパスベースルーティングで配信します。**
 
 ---
 
 ## 📁 ディレクトリ構成
 
 ```
-lediafane-deploy/
-├── Dockerfile                  # PHP 8.1 + Apache (Cloud Run用)
-├── cloudbuild.yaml             # Cloud Build CI/CD設定
-├── .dockerignore
-├── .gitignore
+lediafane-multi-lp/
+├── Dockerfile                       # PHP 8.1 + Apache (Cloud Run用)
+├── cloudbuild.yaml                  # Cloud Build CI/CD
+├── .dockerignore / .gitignore
 ├── apache/
-│   ├── ports.conf              # 8080ポート設定
-│   └── 000-default.conf        # 仮想ホスト設定 (gzip/cache/security)
-└── public/                     # ドキュメントルート
-    ├── index.html              # メインHTML
-    ├── 404.html                # エラーページ
-    ├── .htaccess               # URL正規化・MIME設定
-    ├── robots.txt
-    └── assets/
-        ├── css/style.css       # 約51KB
-        └── js/main.js          # 約4KB
+│   ├── ports.conf                   # 8080ポート設定
+│   └── 000-default.conf             # 仮想ホスト設定
+├── public/                          # ドキュメントルート
+│   ├── index.html                   # 施設一覧Hub (社内向け)
+│   ├── 404.html
+│   ├── .htaccess                    # 末尾スラッシュ正規化
+│   ├── robots.txt
+│   └── rcs/                         # ★ ロイヤルチェスター佐賀
+│       └── lp/
+│           └── lp1/                 # ★ 現在公開中のLP
+│               ├── index.html
+│               └── assets/
+│                   ├── css/style.css
+│                   ├── js/main.js
+│                   └── images/      (20ファイル / 4.2MB)
+└── proxy-for-rc-saga/               # rc-saga.jp用PHPリバースプロキシ
+    ├── index.php
+    ├── .htaccess
+    └── README.md
+```
+
+---
+
+## 🌐 公開URL構造
+
+```
+https://wedding-nfz33-com-665477084949.asia-northeast1.run.app/
+├── /                               → 施設一覧Hub (社内用)
+├── /rcs/lp/lp1/                    → ル・ディアファーヌ キャンペーンLP ★現在公開
+├── /rcs/lp/lp2/                    → (将来追加予定)
+├── /alcazar/lp/lp1/                → (将来: アルカサルアヴィオ)
+├── /garden-terrace/lp/lp1/         → (将来: ガーデンテラス福岡)
+└── ...
+```
+
+リバースプロキシ経由：
+```
+https://rc-saga.jp/rcs/lp/lp1/  →  Cloud Run /rcs/lp/lp1/
 ```
 
 ---
 
 ## 🚀 デプロイ手順
 
-### 1. ローカルで動作確認
+### 初回デプロイ
 
 ```bash
-# ビルド
-docker build -t lediafane-lp .
-
-# 起動
-docker run -p 8080:8080 lediafane-lp
-
-# ブラウザで http://localhost:8080 を確認
-```
-
-### 2. Cloud Run へ手動デプロイ
-
-```bash
-# プロジェクト設定
 gcloud config set project YOUR_PROJECT_ID
 
-# ビルド & デプロイ (一括)
-gcloud run deploy lediafane-lp \
+gcloud run deploy wedding-nfz33-com \
   --source . \
   --region=asia-northeast1 \
   --platform=managed \
@@ -60,9 +74,20 @@ gcloud run deploy lediafane-lp \
   --max-instances=10
 ```
 
-### 3. Cloud Build (GitHub連携) で自動デプロイ
+### 更新デプロイ
 
-`cloudbuild.yaml` を使用。GitHub Desktop等からのpushでトリガー設定。
+```bash
+# (任意) キャッシュバスティング更新 - CSS/JSを修正した時のみ
+TODAY=$(date +%Y%m%d)
+find public -name "index.html" -exec sed -i "s/\?v=[0-9]\{8\}/\?v=${TODAY}/g" {} \;
+
+# デプロイ
+gcloud run deploy wedding-nfz33-com --source . --region=asia-northeast1
+```
+
+### Cloud Build (GitHub連携) で自動デプロイ
+
+`cloudbuild.yaml` を使用。GitHubのpushでトリガー。
 
 ```bash
 gcloud builds submit --config cloudbuild.yaml
@@ -70,142 +95,92 @@ gcloud builds submit --config cloudbuild.yaml
 
 ---
 
-## 🔄 デプロイ後にCSSやJSが反映されない場合（重要）
+## ➕ LPを追加する手順
 
-### キャッシュ対策の仕組み
+### 同じ施設の別LP（例: rcs/lp/lp2 を追加）
 
-このプロジェクトでは以下のキャッシュ戦略を採用しています：
+1. `public/rcs/lp/lp1/` をコピー：
+   ```bash
+   cp -r public/rcs/lp/lp1 public/rcs/lp/lp2
+   ```
+2. `public/rcs/lp/lp2/index.html` の内容を新しいキャンペーンに合わせて編集
+3. 必要に応じて `public/rcs/lp/lp2/assets/images/` に新規画像を追加
+4. ルートの `public/index.html` (Hub) のリンクを追加
+5. 通常通りデプロイ
 
-- **HTML**: `no-cache, no-store, must-revalidate`（毎回最新を取得）
-- **CSS/JS**: 7日間キャッシュ ＋ `?v=YYYYMMDD` バージョンクエリで強制更新
-- **画像/フォント**: 1年間キャッシュ（変更頻度が低い）
+### 別施設のLPを追加（例: alcazar/lp/lp1 を追加）
 
-### CSS/JSを更新したらやること
+1. 新規フォルダ作成：
+   ```bash
+   mkdir -p public/alcazar/lp/lp1
+   cp -r public/rcs/lp/lp1/{index.html,assets} public/alcazar/lp/lp1/
+   ```
+2. `public/alcazar/lp/lp1/index.html` を新施設用に編集
+3. ルートの `public/index.html` (Hub) に新セクション追加
+4. デプロイ
 
-`public/index.html` 内の **`?v=YYYYMMDD` の値を更新**してください：
-
-```html
-<!-- 修正前 -->
-<link rel="stylesheet" href="/assets/css/style.css?v=20260430">
-<script src="/assets/js/main.js?v=20260430" defer></script>
-
-<!-- 修正後 (今日の日付に変更) -->
-<link rel="stylesheet" href="/assets/css/style.css?v=20260501">
-<script src="/assets/js/main.js?v=20260501" defer></script>
-```
-
-**1コマンドで一括更新する場合：**
-```bash
-TODAY=$(date +%Y%m%d)
-sed -i.bak "s/\?v=[0-9]\{8\}/\?v=${TODAY}/g" public/index.html
-rm public/index.html.bak
-```
-
-これでブラウザは新しいファイルとして認識し、強制的に再取得します。
-
-### それでも反映されない場合の確認手順
-
-**1. 自分のブラウザのキャッシュをクリア**
-
-- **iPhone Safari**: 設定 → Safari → 履歴とWebサイトデータを消去
-- **Android Chrome**: 設定 → プライバシー → 閲覧履歴データの削除 → キャッシュされた画像とファイル
-- **PC Chrome**: Cmd/Ctrl + Shift + R（スーパーリロード）
-- **シークレットモード**で開く（最も確実）
-
-**2. Cloud Run の最新リビジョンが反映されているか確認**
-
-```bash
-# 現在のリビジョンを確認
-gcloud run services describe lediafane-lp --region=asia-northeast1 --format='value(status.latestReadyRevisionName)'
-
-# リビジョンの内容確認
-gcloud run revisions describe REVISION_NAME --region=asia-northeast1
-```
-
-**3. CDN/プロキシのキャッシュをクリア**
-
-Cloudflare 経由の場合：
-```
-Cloudflare ダッシュボード → 該当ドメイン → Caching → Purge Everything
-```
-
-**4. CSSファイルが正しく配信されているか直接確認**
-
-```bash
-# CSSを直接ダウンロードして確認
-curl -I https://your-domain.com/assets/css/style.css?v=20260430
-# Content-Length が約53KB であればOK
-
-curl -s https://your-domain.com/assets/css/style.css?v=20260430 | grep "lining-nums"
-# 数件ヒットすればOK
-```
+**重要**: 各LPの `assets/css/style.css` 内の画像参照は **`../images/`** という相対パスです。これは `assets/css/style.css` から見た `assets/images/` への相対参照なので、フォルダ構造を保てばどこに配置しても動作します。
 
 ---
 
 ## 🌐 カスタムドメイン設定
 
-Cloud Run にデプロイ後、独自ドメインを割り当てる場合:
-
 ```bash
+# 例: lp.memolead-wedding.jp を割り当て
 gcloud run domain-mappings create \
-  --service=lediafane-lp \
-  --domain=lediafane.example.com \
+  --service=wedding-nfz33-com \
+  --domain=lp.memolead-wedding.jp \
   --region=asia-northeast1
 ```
 
-DNS の CNAME 設定をお忘れなく。
+---
+
+## 🔄 PHPリバースプロキシ経由公開（rc-saga.jp）
+
+`proxy-for-rc-saga/` 配下のファイルを共有サーバの `rc-saga.jp/rcs/lp/lp1/` に設置。
+詳細は `proxy-for-rc-saga/README.md` 参照。
+
+**プロキシのパスマッピング**
+
+| アクセスURL | プロキシ | Cloud Run側 |
+|---|---|---|
+| `rc-saga.jp/rcs/lp/lp1/` | パススルー | `/rcs/lp/lp1/` |
+| `rc-saga.jp/rcs/lp/lp1/assets/css/style.css` | パススルー | `/rcs/lp/lp1/assets/css/style.css` |
 
 ---
 
 ## 📝 公開前のチェックリスト
 
-- [ ] `index.html` の `<link rel="canonical" href="">` を本番URLに設定
-- [ ] OGP画像 (`og:image`) のURLを設定
-- [ ] Google Analytics / GTM タグの追加
-- [ ] フォーム送信先（Cloudflare Worker + Resend API）の接続
-- [ ] 電話番号: 0952-24-0001 ✅ 設定済み
-- [ ] 住所: 〒840-0815 佐賀県佐賀市天神1-1-28 ✅ 設定済み
-- [ ] LINE公式アカウントURL の設定 (現在は `#` のダミー)
-- [ ] Instagram URL の設定 (現在は `#` のダミー)
-- [ ] スタッフ実写真の差し替え (現在はプレースホルダー)
-- [ ] 来館特典額の確認 (現在は ¥10,000 / JCBギフトカード)
-- [ ] キャンペーン適用期間の調整 (現在 2026年5月末日)
-- [ ] アクセスマップ画像 or Google Maps埋め込みの追加
-- [ ] フェアの詳細写真の追加
-- [ ] お客様の声を実レビューに置き換え
-- [ ] お見積もり例3プランの金額確認
+各LP共通：
+- [ ] `<link rel="canonical">` を本番URLに設定
+- [ ] `<meta property="og:url">` を本番URLに設定
+- [ ] `?v=YYYYMMDD` キャッシュバスティングの値を最新化
+- [ ] OGP画像 (`og:image`) を設定
+- [ ] GA4 / GTM タグを追加
+- [ ] フォーム送信先（Cloudflare Worker + Resend API）を接続
+- [ ] LINE / Instagram URL を実URL化
 
 ---
 
-## 🔧 主な機能
+## 🔧 トラブルシューティング
 
-### CV最適化要素
-- 緊急性カウントダウンバー
-- 来館特典¥10,000確約バナー
-- メディア掲載・受賞歴バー
-- リアルタイム予約状況表示
-- お見積もり例3プラン公開
-- 39%OFF特典明示
-- 来館の流れ6ステップ可視化
-- スタッフ紹介6名
-- 競合比較表
-- 花嫁さまのリアルな1日 (Instagram風)
-- FAQ
-- 30秒予約フォーム
-- 離脱意図検知モーダル
+### CSSが反映されない
+1. ブラウザのシークレットモードで再読み込み
+2. `?v=YYYYMMDD` の値を更新
+3. Cloud Runの最新リビジョンを確認:
+   ```bash
+   gcloud run services describe wedding-nfz33-com --region=asia-northeast1
+   ```
 
-### 技術仕様
-- レスポンシブ対応 (SP優先設計)
-- IntersectionObserver スクロールアニメーション
-- 3段階セーフティネット付き表示制御
-- プリコネクト・プリロード最適化
-- gzip圧縮
-- ブラウザキャッシュ (CSS/JS 1ヶ月、画像 1年)
-- セキュリティヘッダー (X-Frame-Options, HSTS, etc.)
+### `/rcs/lp/lp1` (末尾スラッシュなし) でアクセスすると相対パスが壊れる
+ルートの `.htaccess` で末尾スラッシュ強制リダイレクトを設定済み。`mod_rewrite` が有効でない場合は手動で `/rcs/lp/lp1/` (末尾スラッシュ付き) でアクセス。
+
+### 404になる
+- ファイルが正しく `public/rcs/lp/lp1/` 配下にあるか確認
+- Dockerビルド時に `public/` がコピーされているか `Dockerfile` を確認
 
 ---
 
 ## 📞 制作
 
 **LINK-UP Management**
-

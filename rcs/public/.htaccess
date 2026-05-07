@@ -1,23 +1,22 @@
 # ===========================================
-# Le Diaphane - .htaccess
+# Memolead Wedding LP Hub - .htaccess
 # ===========================================
 
-# === デフォルトドキュメント ===
 DirectoryIndex index.html
-
-# === エラーページ ===
 ErrorDocument 404 /404.html
 
-# === URL正規化 (末尾スラッシュ・index.html隠蔽) ===
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 	
-	# index.html を隠蔽 (https://example.com/index.html → https://example.com/)
+	# index.html を隠蔽
 	RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /(.*)index\.html\ HTTP/
 	RewriteRule ^(.*)index\.html$ /$1 [R=301,L]
 	
-	# 末尾スラッシュ統一 (なし → ありに正規化、/assets/は除外)
-	# 必要に応じて有効化
+	# LP配下のディレクトリアクセス時に末尾スラッシュを強制
+	# /rcs/lp/lp1 → /rcs/lp/lp1/ (相対パス維持のため必須)
+	RewriteCond %{REQUEST_FILENAME} -d
+	RewriteCond %{REQUEST_URI} !(.*)/$
+	RewriteRule ^(.*)$ /$1/ [R=301,L]
 </IfModule>
 
 # === MIME types ===
