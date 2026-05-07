@@ -5,6 +5,42 @@
 
 ---
 
+## 📚 ドキュメント
+
+- **このREADME**: クイックスタート
+- **[docs/OPERATIONS.md](docs/OPERATIONS.md)** ★必読: 運用ガイドライン・命名規則・よくある作業フロー
+- **[_template/README.md](_template/README.md)**: テンプレート構造
+- **[proxy-for-rc-saga/README.md](proxy-for-rc-saga/README.md)**: PHPプロキシ設置手順
+
+---
+
+## ⚡ クイックリファレンス
+
+### 新規LPを追加
+
+```bash
+# テナント名 LP-ID
+./scripts/create-lp.sh rcs lp2
+./scripts/create-lp.sh alcazar lp1
+./scripts/create-lp.sh garden-terrace photo-wedding
+```
+
+### CSS/JSを修正してデプロイ
+
+```bash
+# キャッシュ強制更新付きでデプロイ
+./scripts/deploy.sh --bust-cache
+```
+
+### ローカル動作確認
+
+```bash
+./scripts/dev.sh
+# http://localhost:8080 で確認
+```
+
+---
+
 ## 📁 ディレクトリ構成
 
 ```
