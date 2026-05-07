@@ -70,6 +70,78 @@ gcloud builds submit --config cloudbuild.yaml
 
 ---
 
+## 🔄 デプロイ後にCSSやJSが反映されない場合（重要）
+
+### キャッシュ対策の仕組み
+
+このプロジェクトでは以下のキャッシュ戦略を採用しています：
+
+- **HTML**: `no-cache, no-store, must-revalidate`（毎回最新を取得）
+- **CSS/JS**: 7日間キャッシュ ＋ `?v=YYYYMMDD` バージョンクエリで強制更新
+- **画像/フォント**: 1年間キャッシュ（変更頻度が低い）
+
+### CSS/JSを更新したらやること
+
+`public/index.html` 内の **`?v=YYYYMMDD` の値を更新**してください：
+
+```html
+<!-- 修正前 -->
+<link rel="stylesheet" href="/assets/css/style.css?v=20260430">
+<script src="/assets/js/main.js?v=20260430" defer></script>
+
+<!-- 修正後 (今日の日付に変更) -->
+<link rel="stylesheet" href="/assets/css/style.css?v=20260501">
+<script src="/assets/js/main.js?v=20260501" defer></script>
+```
+
+**1コマンドで一括更新する場合：**
+```bash
+TODAY=$(date +%Y%m%d)
+sed -i.bak "s/\?v=[0-9]\{8\}/\?v=${TODAY}/g" public/index.html
+rm public/index.html.bak
+```
+
+これでブラウザは新しいファイルとして認識し、強制的に再取得します。
+
+### それでも反映されない場合の確認手順
+
+**1. 自分のブラウザのキャッシュをクリア**
+
+- **iPhone Safari**: 設定 → Safari → 履歴とWebサイトデータを消去
+- **Android Chrome**: 設定 → プライバシー → 閲覧履歴データの削除 → キャッシュされた画像とファイル
+- **PC Chrome**: Cmd/Ctrl + Shift + R（スーパーリロード）
+- **シークレットモード**で開く（最も確実）
+
+**2. Cloud Run の最新リビジョンが反映されているか確認**
+
+```bash
+# 現在のリビジョンを確認
+gcloud run services describe lediafane-lp --region=asia-northeast1 --format='value(status.latestReadyRevisionName)'
+
+# リビジョンの内容確認
+gcloud run revisions describe REVISION_NAME --region=asia-northeast1
+```
+
+**3. CDN/プロキシのキャッシュをクリア**
+
+Cloudflare 経由の場合：
+```
+Cloudflare ダッシュボード → 該当ドメイン → Caching → Purge Everything
+```
+
+**4. CSSファイルが正しく配信されているか直接確認**
+
+```bash
+# CSSを直接ダウンロードして確認
+curl -I https://your-domain.com/assets/css/style.css?v=20260430
+# Content-Length が約53KB であればOK
+
+curl -s https://your-domain.com/assets/css/style.css?v=20260430 | grep "lining-nums"
+# 数件ヒットすればOK
+```
+
+---
+
 ## 🌐 カスタムドメイン設定
 
 Cloud Run にデプロイ後、独自ドメインを割り当てる場合:
