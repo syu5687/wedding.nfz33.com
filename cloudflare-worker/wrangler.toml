@@ -1,0 +1,18 @@
+name = "rcs-form"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+
+# === 環境変数 (公開可能なものはここに、機密はsecretsで設定) ===
+[vars]
+# CORS許可するオリジン (カンマ区切り)
+ALLOWED_ORIGIN = "https://rc-saga.jp,https://wedding-nfz33-com-665477084949.asia-northeast1.run.app"
+
+# 受信メール (会場側)
+TO_EMAIL = "info@rc-saga.jp"
+
+# 送信元 (Resendで認証済みドメイン nfz33.com を使用)
+FROM_EMAIL = "Le Diaphane <noreply@nfz33.com>"
+
+# === シークレットの設定方法 ===
+# wrangler secret put RESEND_API_KEY
+# (プロンプトに re_xxxxxxx... のキーをペースト)

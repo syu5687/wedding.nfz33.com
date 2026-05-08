@@ -1236,16 +1236,16 @@
       <p class="form-sub">必須項目はわずか3つ。ご予約後、24時間以内に専属プランナーよりご連絡いたします。</p>
       <div class="form-time">⏱ 平均入力時間：30秒</div>
       
-      <form>
+      <form id="reserveForm" novalidate>
         <div class="form-group">
           <label class="form-label">ご希望のフェア<span class="req">必須</span></label>
           <div class="form-radio-group">
             <div class="form-radio">
-              <input type="radio" name="fair" id="f1" checked>
+              <input type="radio" name="fair" id="f1" value="プレミアム体験フェア" checked>
               <label for="f1">プレミアム体験</label>
             </div>
             <div class="form-radio">
-              <input type="radio" name="fair" id="f2">
+              <input type="radio" name="fair" id="f2" value="サクッと見学60分フェア">
               <label for="f2">サクッと見学60分</label>
             </div>
           </div>
@@ -1253,34 +1253,50 @@
         
         <div class="form-group">
           <label class="form-label">お名前<span class="req">必須</span></label>
-          <input type="text" class="form-input" placeholder="例) 佐賀 花子">
+          <input type="text" name="name" class="form-input" placeholder="例) 佐賀 花子" required>
         </div>
         
         <div class="form-group">
           <label class="form-label">電話番号<span class="req">必須</span></label>
-          <input type="tel" class="form-input" placeholder="例) 090-1234-5678">
+          <input type="tel" name="tel" class="form-input" placeholder="例) 090-1234-5678" required pattern="[0-9\-+() ]{10,20}">
         </div>
         
         <div class="form-group">
           <label class="form-label">メールアドレス<span class="opt">任意</span></label>
-          <input type="email" class="form-input" placeholder="例) example@email.com">
+          <input type="email" name="email" class="form-input" placeholder="例) example@email.com">
         </div>
         
         <div class="form-group">
           <label class="form-label">ご希望日(第一希望)<span class="opt">任意</span></label>
-          <input type="date" class="form-input">
+          <input type="date" name="preferred_date" class="form-input">
         </div>
         
         <div class="form-group">
           <label class="form-label">ご質問・ご要望<span class="opt">任意</span></label>
-          <textarea class="form-textarea" rows="3" placeholder="例) 少人数婚を検討しています など"></textarea>
+          <textarea name="message" class="form-textarea" rows="3" placeholder="例) 少人数婚を検討しています など"></textarea>
         </div>
         
-        <button type="submit" class="form-submit">
-          無料で予約する
+        <!-- ハニーポット (スパム対策・人間には見えない) -->
+        <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true">
+        
+        <div class="form-error" id="formError" style="display:none;"></div>
+        
+        <button type="submit" class="form-submit" id="submitBtn">
+          <span class="form-submit-text">無料で予約する</span>
           <small>来館特典¥10,000＋WEB限定39%OFF</small>
         </button>
       </form>
+      
+      <!-- 送信完了画面 -->
+      <div class="form-success" id="formSuccess" style="display:none;">
+        <div class="form-success-icon">✓</div>
+        <h3 class="form-success-title">ご予約を承りました</h3>
+        <p class="form-success-text">
+          24時間以内に専属プランナーより、ご登録の連絡先にご連絡いたします。<br>
+          ご質問等ございましたらお電話でも承ります。
+        </p>
+        <a href="tel:0952240001" class="form-success-tel">📞 0952-24-0001</a>
+      </div>
       
       <div class="form-divider">OR</div>
       

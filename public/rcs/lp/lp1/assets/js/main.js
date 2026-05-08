@@ -263,4 +263,103 @@
     })();
     
   })();
+
+  // ==========================================
+  // フォーム送信 (Cloudflare Worker + Resend API)
+  // ==========================================
+  (function(){
+    const form = document.getElementById('reserveForm');
+    if(!form) return;
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const errorBox = document.getElementById('formError');
+    const successBox = document.getElementById('formSuccess');
+    
+    // Cloudflare Worker のエンドポイント (本番デプロイ後に実URLに置換)
+    const ENDPOINT = 'https://rcs-form.linkup-mng.workers.dev/';
+    
+    function showError(msg){
+      errorBox.textContent = msg;
+      errorBox.style.display = 'block';
+      errorBox.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+    function clearError(){
+      errorBox.style.display = 'none';
+      errorBox.textContent = '';
+    }
+    
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      clearError();
+      
+      // ハニーポットチェック (Botは記入してくる)
+      if(form.website.value.trim() !== ''){
+        // Botとして無視 (見た目は成功)
+        form.style.display = 'none';
+        successBox.style.display = 'block';
+        return;
+      }
+      
+      // バリデーション
+      const data = {
+        fair: form.fair.value,
+        name: form.name.value.trim(),
+        tel: form.tel.value.trim(),
+        email: form.email.value.trim(),
+        preferred_date: form.preferred_date.value,
+        message: form.message.value.trim(),
+        source: 'rcs/lp/lp1 - Le Diaphane',
+        page_url: location.href,
+        submitted_at: new Date().toISOString()
+      };
+      
+      if(!data.name){ showError('お名前を入力してください'); return; }
+      if(!data.tel){ showError('電話番号を入力してください'); return; }
+      if(!/^[0-9\-+() ]{10,20}$/.test(data.tel)){
+        showError('電話番号の形式をご確認ください'); return;
+      }
+      if(data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){
+        showError('メールアドレスの形式をご確認ください'); return;
+      }
+      
+      // 送信中UIへ
+      submitBtn.disabled = true;
+      const btnText = submitBtn.querySelector('.form-submit-text');
+      const originalText = btnText.textContent;
+      btnText.textContent = '送信中...';
+      
+      try {
+        const res = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        });
+        
+        if(!res.ok){
+          throw new Error('送信に失敗しました (HTTP ' + res.status + ')');
+        }
+        
+        // 成功 → 成功画面表示
+        form.style.display = 'none';
+        successBox.style.display = 'block';
+        successBox.scrollIntoView({behavior:'smooth', block:'center'});
+        
+        // GTM/GA4イベント
+        try {
+          if(window.dataLayer){
+            window.dataLayer.push({
+              event: 'form_submit_success',
+              fair: data.fair
+            });
+          }
+        } catch(e){}
+        
+      } catch(err){
+        showError('送信に失敗しました。お手数ですがお電話 (0952-24-0001) でもご連絡可能です。');
+        submitBtn.disabled = false;
+        btnText.textContent = originalText;
+      }
+    });
+  })();
+  
 })();

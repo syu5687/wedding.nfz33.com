@@ -1,0 +1,14 @@
+{
+  "name": "rcs-form-worker",
+  "version": "1.0.0",
+  "description": "Royal Chester Saga form submission worker (Resend API proxy)",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "logs": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
