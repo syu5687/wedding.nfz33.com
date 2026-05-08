@@ -1,83 +1,43 @@
-/*!
- * Royal Chester Saga - Hanabi × Wedding LP Scripts
- * Copyright (c) Royal Chester Saga. All rights reserved.
- * Produced by LINK-UP Management
- */
+// カウントダウン（応募締切：2026年5月10日 23:59）
+function tickCountdown(){
+  var deadline = new Date('2026-05-10T23:59:59+09:00').getTime();
+  var now = Date.now();
+  var diff = deadline - now;
+  if(diff <= 0){
+    document.querySelectorAll('#countdown,#countdown-final').forEach(function(el){el.textContent='応募受付終了'});
+    return;
+  }
+  var days = Math.floor(diff / (1000*60*60*24));
+  var hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+  var mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+  var top = document.getElementById('countdown');
+  if(top) top.innerHTML = '<b>'+days+'</b>日<b>'+hours+'</b>時間<b>'+mins+'</b>分';
+  var fin = document.getElementById('countdown-final');
+  if(fin) fin.textContent = days+'日 '+hours+'時間 '+mins+'分';
+}
+tickCountdown();
+setInterval(tickCountdown, 30000);
 
-(function(){
-  'use strict';
-  
-  // === カウントダウン（5月10日 23:59 まで） ===
-  (function(){
-    const target = new Date('2026-05-10T23:59:00+09:00').getTime();
-    const el = document.getElementById('countdown');
-    if(!el) return;
-    
-    function tick(){
-      const now = Date.now();
-      const diff = target - now;
-      if(diff <= 0){
-        el.innerHTML = '<b>0</b>日<b>00</b>時<b>00</b>分';
-        return;
-      }
-      const days = Math.floor(diff / (1000*60*60*24));
-      const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-      const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
-      el.innerHTML = `<b>${days}</b>日<b>${String(hours).padStart(2,'0')}</b>時<b>${String(mins).padStart(2,'0')}</b>分`;
+// FAQ アコーディオン
+function toggleFaq(btn){
+  var item = btn.closest('.faq-item');
+  var isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(function(el){el.classList.remove('open')});
+  if(!isOpen) item.classList.add('open');
+}
+
+// fade-up 出現
+var observer = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
     }
-    tick();
-    setInterval(tick, 60000);
-  })();
-  
-  // === Reveal アニメーション (3段階セーフティネット) ===
-  (function(){
-    document.body.classList.add('js-reveal-ready');
-    
-    const reveals = document.querySelectorAll('.reveal');
-    if(!reveals.length) return;
-    
-    // IntersectionObserver で順次表示
-    if('IntersectionObserver' in window){
-      const observer = new IntersectionObserver((entries)=>{
-        entries.forEach(entry => {
-          if(entry.isIntersecting){
-            entry.target.classList.add('in');
-            observer.unobserve(entry.target);
-          }
-        });
-      }, {rootMargin: '0px 0px -10% 0px', threshold: 0.1});
-      
-      reveals.forEach(el => observer.observe(el));
-    } else {
-      // フォールバック: 即時表示
-      reveals.forEach(el => el.classList.add('in'));
-    }
-    
-    // セーフティ1: 1秒後にビューポート内のものを強制表示
-    setTimeout(()=>{
-      reveals.forEach(el => {
-        const rect = el.getBoundingClientRect();
-        if(rect.top < window.innerHeight && rect.bottom > 0){
-          el.classList.add('in');
-        }
-      });
-    }, 1000);
-    
-    // セーフティ2: 3秒後に全要素強制表示
-    setTimeout(()=>{
-      reveals.forEach(el => el.classList.add('in'));
-    }, 3000);
-  })();
-  
-  // === スムーススクロール ===
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e){
-      const target = document.querySelector(this.getAttribute('href'));
-      if(target){
-        e.preventDefault();
-        target.scrollIntoView({behavior:'smooth',block:'start'});
-      }
-    });
   });
-  
-})();
+},{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.fade-up').forEach(function(el){observer.observe(el)});
+
+// fallback: 何かの理由でobserverが発火しなかった場合、3秒後に全部表示
+setTimeout(function(){
+  document.querySelectorAll('.fade-up:not(.visible)').forEach(function(el){el.classList.add('visible')});
+}, 3000);
