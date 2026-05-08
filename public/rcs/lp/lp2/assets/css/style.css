@@ -1119,3 +1119,223 @@ footer .container{display:flex;flex-direction:column;gap:14px;align-items:center
   transition:opacity .8s ease,transform .8s ease;
 }
 .fade-up.visible{opacity:1;transform:translateY(0)}
+/* ========================================
+   OUR TEAM スタッフ紹介セクション
+   ======================================== */
+.team{
+  background:linear-gradient(180deg,#fff 0%,var(--c-bg) 100%);
+  padding:80px 0;
+}
+@media(max-width:768px){.team{padding:60px 0}}
+
+.team .sec-head{margin-bottom:40px}
+
+.team-intro{
+  text-align:center;max-width:680px;margin:0 auto 48px;
+  font-size:14px;line-height:2;color:var(--c-ink-soft);
+}
+
+.team-grid{
+  display:grid;gap:24px;
+  grid-template-columns:1fr;
+  max-width:1100px;margin:0 auto;
+}
+@media(min-width:640px){
+  .team-grid{grid-template-columns:repeat(2,1fr);gap:28px}
+}
+@media(min-width:1024px){
+  .team-grid{grid-template-columns:repeat(3,1fr);gap:32px}
+}
+
+.team-card{
+  background:#fff;border-radius:6px;overflow:hidden;
+  box-shadow:var(--shadow-soft);
+  transition:transform .4s,box-shadow .4s;
+  position:relative;
+  border:1px solid rgba(201,169,90,.12);
+}
+.team-card:hover{
+  transform:translateY(-6px);
+  box-shadow:var(--shadow-card);
+}
+
+.team-photo-wrap{
+  position:relative;
+  aspect-ratio:4/5;
+  overflow:hidden;
+  background:linear-gradient(135deg,#E8DCC8 0%,#D4C0A0 100%);
+}
+
+/* 実写真（img） */
+.team-photo{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  object-position:center 25%;
+  display:block;
+  transition:transform .6s ease;
+}
+.team-card:hover .team-photo{transform:scale(1.04)}
+.team-photo[data-staff="chief"]{object-position:center 35%}
+.team-photo[data-staff="planner"]{object-position:center 28%}
+.team-photo[data-staff="chef"]{object-position:center 22%}
+.team-photo[data-staff="stylist"]{object-position:38% center}
+.team-photo[data-staff="haimake"]{object-position:center 30%}
+.team-photo[data-staff="florist"]{object-position:center 30%}
+
+/* SVGイラストポートレート用背景（フォールバック） */
+.team-portrait{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  display:block;
+}
+.team-portrait svg{width:100%;height:100%;display:block}
+.team-portrait-bg-1{background:linear-gradient(165deg,#F5E6DC 0%,#E8C5B4 100%)}
+.team-portrait-bg-2{background:linear-gradient(165deg,#E8E5D0 0%,#C8D4B8 100%)}
+.team-portrait-bg-3{background:linear-gradient(165deg,#3D332A 0%,#2A241D 100%)}
+.team-portrait-bg-4{background:linear-gradient(165deg,#E8DCE8 0%,#C8B8D4 100%)}
+.team-portrait-bg-5{background:linear-gradient(165deg,#F5DCD0 0%,#D4A88C 100%)}
+.team-portrait-bg-6{background:linear-gradient(165deg,#E0E8DC 0%,#B8C8B0 100%)}
+
+.team-photo-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 50%,rgba(10,21,48,.85) 100%);
+  z-index:2;
+}
+
+.team-position-badge{
+  position:absolute;top:14px;left:14px;z-index:3;
+  background:rgba(255,255,255,.95);
+  color:var(--c-ink);
+  padding:6px 12px;border-radius:100px;
+  font-family:var(--f-en);font-size:10px;
+  letter-spacing:.15em;font-weight:600;
+  backdrop-filter:blur(10px);
+}
+
+.team-experience{
+  position:absolute;top:14px;right:14px;z-index:3;
+  background:linear-gradient(135deg,var(--c-gold),var(--c-gold-deep));
+  color:#fff;width:48px;height:48px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;line-height:1;
+  font-family:var(--f-display);
+  box-shadow:0 4px 12px rgba(201,169,90,.4);
+}
+.team-experience b{font-size:18px;font-weight:600}
+.team-experience small{font-size:7px;letter-spacing:.1em;margin-top:2px;font-family:var(--f-en)}
+
+.team-name-block{
+  position:absolute;left:0;right:0;bottom:0;z-index:3;
+  padding:18px 18px 18px;
+  color:#fff;
+}
+.team-position{
+  font-family:var(--f-en);font-size:13px;
+  letter-spacing:.22em;color:var(--c-gold-light);
+  font-weight:500;
+  text-shadow:0 1px 8px rgba(0,0,0,.4);
+}
+.team-name-jp{
+  font-family:var(--f-jp);font-size:22px;font-weight:600;
+  letter-spacing:.05em;line-height:1.2;
+}
+.team-name-en{
+  font-family:var(--f-en);font-size:10px;
+  letter-spacing:.2em;color:rgba(255,255,255,.75);
+  margin-top:4px;font-weight:400;
+}
+
+.team-body{
+  padding:22px 22px 24px;
+}
+.team-message{
+  font-size:13px;color:var(--c-ink);
+  line-height:1.95;letter-spacing:.02em;
+  position:relative;
+  padding-left:14px;
+  margin-bottom:18px;
+  border-left:2px solid var(--c-gold);
+}
+.team-info{
+  background:var(--c-bg);
+  border-radius:4px;
+  padding:12px 14px;
+  margin-bottom:14px;
+}
+.team-info-row{
+  display:flex;gap:10px;
+  font-size:11.5px;
+  line-height:1.7;
+  padding:3px 0;
+}
+.team-info-label{
+  flex-shrink:0;
+  font-family:var(--f-en);
+  font-size:9px;letter-spacing:.18em;
+  color:var(--c-gold-deep);
+  font-weight:600;
+  padding-top:3px;
+  width:54px;
+}
+.team-info-value{
+  flex:1;
+  color:var(--c-ink);
+}
+.team-tags{
+  display:flex;flex-wrap:wrap;gap:6px;
+}
+.team-tags span{
+  font-size:10.5px;
+  padding:3px 9px;
+  background:rgba(201,169,90,.1);
+  color:var(--c-gold-deep);
+  border-radius:50px;
+  letter-spacing:.02em;
+}
+
+/* チーム宣言ブロック */
+.team-promise{
+  margin-top:60px;
+  background:linear-gradient(135deg,var(--c-night) 0%,var(--c-night-soft) 100%);
+  color:#fff;
+  padding:50px 30px;
+  border-radius:12px;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.team-promise::before{
+  content:"";
+  position:absolute;
+  top:-50%;left:-10%;
+  width:120%;height:200%;
+  background:radial-gradient(ellipse,rgba(201,169,90,.15) 0%,transparent 60%);
+  z-index:1;
+}
+.team-promise-eyebrow{
+  position:relative;z-index:2;
+  font-family:var(--f-en);
+  font-size:10px;letter-spacing:.35em;
+  color:var(--c-gold);
+  margin-bottom:18px;
+}
+.team-promise-text{
+  position:relative;z-index:2;
+  font-size:clamp(15px,2.4vw,18px);
+  line-height:2.2;letter-spacing:.05em;
+  font-weight:300;
+  margin-bottom:24px;
+}
+.team-promise-text em{
+  color:var(--c-gold-light);font-style:normal;font-weight:500;
+}
+.team-promise-signature{
+  font-family:var(--f-display);font-size:13px;
+  color:rgba(255,255,255,.7);
+  font-style:italic;letter-spacing:.05em;
+  position:relative;z-index:2;
+}
+.team-promise-signature::before{
+  content:'';display:block;width:40px;height:1px;
+  background:var(--c-gold);margin:0 auto 12px;
+}
