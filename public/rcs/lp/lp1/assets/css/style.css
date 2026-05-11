@@ -1432,9 +1432,17 @@ section{padding:80px 20px;position:relative}
   padding:14px 16px;border-bottom:1px solid rgba(168,138,79,.12);
 }
 .story-avatar{
-  width:36px;height:36px;border-radius:50%;
-  background:linear-gradient(135deg,#F09433,#DC2743,#BC1888);
-  padding:2px;flex-shrink:0;
+  width:40px;height:40px;border-radius:50%;
+  background:#fff;
+  padding:0;flex-shrink:0;
+  border:1px solid rgba(168,138,79,.3);
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.story-avatar-logo{
+  width:80%;height:80%;
+  object-fit:contain;
+  display:block;
 }
 .story-avatar-inner{
   width:100%;height:100%;border-radius:50%;

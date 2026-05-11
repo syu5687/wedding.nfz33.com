@@ -100,7 +100,7 @@
     
     let shown = sessionStorage.getItem('exitShown') === '1';
     const startTime = Date.now();
-    const MIN_DWELL = 3000; // 最低3秒は閲覧してから発火（即離脱の人には出さない）
+    const MIN_DWELL = 15000; // 最低15秒は閲覧してから発火（即離脱の人には出さない・じっくり読みたい人を妨げない）
     
     // テストモード: URLに ?exitTest=1 を付けると即時発火（動作確認用）
     const isTestMode = location.search.indexOf('exitTest=1') !== -1;
@@ -173,11 +173,11 @@
     
     // ==========================================
     // 【トリガー3】SP: 一定時間無操作 + スクロール深度
-    // 30秒無操作 かつ スクロール50%超 = 読了済み迷い中
-    // 45秒無操作 = 単純な放置 (フォールバック)
+    // 60秒無操作 かつ スクロール50%超 = 読了済み迷い中
+    // 90秒無操作 = 単純な放置 (フォールバック)
     // ==========================================
-    let idleTimer30 = null;
-    let idleTimer45 = null;
+    let idleTimer60 = null;
+    let idleTimer90 = null;
     
     function getScrollPct(){
       const docH = document.documentElement.scrollHeight - window.innerHeight;
@@ -188,22 +188,22 @@
     function resetIdle(){
       if(window.innerWidth >= 768) return; // SP専用
       
-      clearTimeout(idleTimer30);
-      clearTimeout(idleTimer45);
+      clearTimeout(idleTimer60);
+      clearTimeout(idleTimer90);
       
-      // 30秒で深いスクロール済みなら表示（読了→迷い）
-      idleTimer30 = setTimeout(()=>{
+      // 60秒で深いスクロール済みなら表示（読了→迷い）
+      idleTimer60 = setTimeout(()=>{
         if(getScrollPct() >= 50){
-          showModal('idle_30s_deep_scroll');
+          showModal('idle_60s_deep_scroll');
         }
-      }, 30000);
+      }, 60000);
       
-      // 45秒無操作で強制表示（離脱前最終防衛線）
-      idleTimer45 = setTimeout(()=>{
+      // 90秒無操作で強制表示（離脱前最終防衛線）
+      idleTimer90 = setTimeout(()=>{
         if(window.scrollY > 300){
-          showModal('idle_45s');
+          showModal('idle_90s');
         }
-      }, 45000);
+      }, 90000);
     }
     
     window.addEventListener('scroll', resetIdle, {passive: true});
@@ -224,12 +224,12 @@
         // 最下部から200px以内に到達
         if(scrollBottom >= docHeight - 200){
           bottomReached = true;
-          // 読了直後の2秒待ち（CTAクリックチャンスを与える）
+          // 読了直後の3秒待ち（CTAクリックチャンスを十分に与える）
           setTimeout(()=>{
             if(!shown){
               showModal('reached_bottom');
             }
-          }, 2000);
+          }, 3000);
         }
       }, {passive: true});
     })();
@@ -248,14 +248,14 @@
           leftTime = Date.now();
         } else if(leftPage){
           const awayDuration = Date.now() - leftTime;
-          // 3秒以上離れて戻ってきた場合のみ発火（チラ見ではなく明確な離脱）
-          if(awayDuration > 3000 && window.innerWidth < 768){
-            // 復帰直後の1.5秒待ち
+          // 5秒以上離れて戻ってきた場合のみ発火（チラ見ではなく明確な離脱）
+          if(awayDuration > 5000 && window.innerWidth < 768){
+            // 復帰直後の3秒待ち（じっくり閲覧再開する余地を与える）
             setTimeout(()=>{
               if(!shown){
                 showModal('returned_from_tab');
               }
-            }, 1500);
+            }, 3000);
           }
           leftPage = false;
         }
