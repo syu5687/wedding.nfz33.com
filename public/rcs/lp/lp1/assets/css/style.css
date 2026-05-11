@@ -107,7 +107,20 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 20px;
 }
-.brand{display:flex;flex-direction:column;line-height:1.1}
+.brand{display:flex;align-items:center;gap:12px;line-height:1.1;text-decoration:none}
+.brand-logo{
+  height:42px;width:auto;display:block;
+}
+@media(max-width:768px){
+  .brand-logo{height:34px}
+}
+.brand-jp-sub{
+  font-family:var(--f-display);font-size:14px;font-weight:500;
+  color:var(--c-ink);letter-spacing:.04em;font-style:italic;
+}
+@media(max-width:768px){
+  .brand-jp-sub{display:none}
+}
 .brand-en{font-family:var(--f-en);font-size:11px;letter-spacing:.2em;color:var(--c-gold)}
 .brand-jp{font-family:var(--f-display);font-size:18px;font-weight:500;color:var(--c-ink);margin-top:2px}
 .header-cta{display:none}
@@ -499,10 +512,17 @@ section{padding:80px 20px;position:relative}
   padding-top:20px;border-top:1px solid rgba(168,138,79,.2);
 }
 .voice-avatar{
-  width:44px;height:44px;border-radius:50%;
+  width:48px;height:48px;border-radius:50%;
   background:linear-gradient(135deg,var(--c-rose-soft),var(--c-rose));
   display:flex;align-items:center;justify-content:center;
   font-family:var(--f-display);font-size:18px;color:#fff;font-weight:500;
+  flex-shrink:0;
+}
+.voice-avatar-img{
+  background-size:cover;background-position:center;background-repeat:no-repeat;
+  font-size:0;
+  border:2px solid #fff;
+  box-shadow:0 4px 12px rgba(168,138,79,0.2);
 }
 .voice-name{font-size:13px;font-weight:600;color:var(--c-ink)}
 .voice-detail{font-size:11px;color:var(--c-ink-soft);margin-top:2px}
@@ -528,9 +548,9 @@ section{padding:80px 20px;position:relative}
   height:200px;background-size:cover;background-position:center;
   position:relative;
 }
-.fair-img:nth-of-type(1){background-image:url('../images/gallery_02.jpg')}
-.fair-card:nth-child(1) .fair-img{background-image:url('../images/gallery_02.jpg')}
-.fair-card:nth-child(2) .fair-img{background-image:url('../images/gallery_04.jpg')}
+.fair-img:nth-of-type(1){background-image:url('../images/fair_premium.jpg')}
+.fair-card:nth-child(1) .fair-img{background-image:url('../images/fair_premium.jpg')}
+.fair-card:nth-child(2) .fair-img{background-image:url('../images/fair_quick.jpg')}
 .fair-tag{
   position:absolute;top:16px;left:16px;
   background:var(--c-gold);color:#fff;
@@ -1660,17 +1680,40 @@ section{padding:80px 20px;position:relative}
 
 /* スタッフからのメッセージブロック */
 .team-promise{
-  max-width:820px;margin:64px auto 0;
-  padding:48px 32px;
+  max-width:1080px;margin:64px auto 0;
   background:linear-gradient(135deg,#2A241D 0%,#1f1a14 100%);
   color:#fff;border-radius:6px;
-  text-align:center;position:relative;overflow:hidden;
+  position:relative;overflow:hidden;
+  display:grid;grid-template-columns:1fr;gap:0;
+}
+@media(min-width:768px){
+  .team-promise{
+    grid-template-columns:1fr 1fr;
+    min-height:380px;
+  }
+}
+.team-promise-photo{
+  aspect-ratio:16/10;
+  background-size:cover;background-position:center;
+  background-repeat:no-repeat;
+}
+@media(min-width:768px){
+  .team-promise-photo{aspect-ratio:auto;height:100%}
+}
+.team-promise-body{
+  padding:40px 32px;text-align:center;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;
+}
+@media(min-width:768px){
+  .team-promise-body{padding:48px 40px}
 }
 .team-promise::before{
   content:'';position:absolute;
-  top:-50px;left:50%;transform:translateX(-50%);
+  top:-50px;right:-50px;
   width:200px;height:200px;border-radius:50%;
   background:radial-gradient(circle,rgba(168,138,79,.15) 0%,transparent 70%);
+  pointer-events:none;
 }
 .team-promise-eyebrow{
   font-family:var(--f-en);font-size:11px;letter-spacing:.3em;
@@ -1679,7 +1722,7 @@ section{padding:80px 20px;position:relative}
 }
 .team-promise-text{
   font-family:var(--f-display);
-  font-size:clamp(20px,4.5vw,28px);
+  font-size:clamp(18px,3.5vw,24px);
   font-weight:400;line-height:1.7;
   margin-bottom:24px;
   position:relative;z-index:2;
