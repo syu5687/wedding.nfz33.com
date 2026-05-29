@@ -9,7 +9,7 @@
   
   // カウントダウン (キャンペーン終了まで)
   (function(){
-    const deadline = new Date('2026-05-31T23:59:59').getTime();
+    const deadline = new Date('2026-06-30T23:59:59').getTime();
     const el = document.getElementById('countdown');
     function tick(){
       const now = new Date().getTime();
@@ -351,6 +351,10 @@
               event: 'form_submit_success',
               fair: data.fair
             });
+          }
+          // GA4 / Meta / LINE へ直接コンバージョン送信
+          if(typeof window.trackFormConversion === 'function'){
+            window.trackFormConversion(data.fair);
           }
         } catch(e){}
         

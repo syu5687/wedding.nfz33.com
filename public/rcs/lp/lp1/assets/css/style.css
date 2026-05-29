@@ -1177,17 +1177,9 @@ section{padding:80px 20px;position:relative}
   font-size:13px;font-weight:500;margin:0 auto 16px;
   color:var(--c-ink);
 }
-.insta-handle::before{
-  content:'';width:24px;height:24px;border-radius:7px;
-  background:linear-gradient(135deg,#F09433,#E6683C,#DC2743,#CC2366,#BC1888);
-  display:flex;align-items:center;justify-content:center;
-  position:relative;
-}
-.insta-handle::after{
-  content:'';position:absolute;width:14px;height:14px;
-  border:2px solid #fff;border-radius:5px;
-  margin-left:-19px;
-}
+/* InstagramアイコンはHTML側のインラインSVGに統一（旧CSS擬似アイコンは無効化） */
+.insta-handle::before{ content:none; }
+.insta-handle::after{ content:none; }
 .insta-grid{
   display:grid;gap:8px;
   grid-template-columns:repeat(3,1fr);
