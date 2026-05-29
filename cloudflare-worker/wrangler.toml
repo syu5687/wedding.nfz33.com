@@ -13,6 +13,9 @@ TO_EMAIL = "info@rc-saga.jp"
 # 送信元 (Resendで認証済みドメイン nfz33.com を使用)
 FROM_EMAIL = "Le Diaphane <noreply@nfz33.com>"
 
+# CC送信先 (管理者複数アドレス、カンマ区切り)
+CC_EMAILS = "mk@emanet.jp,kawakami-toru@memolead.co.jp,watanabe-tomo@memolead.co.jp"
+
 # === シークレットの設定方法 ===
 # wrangler secret put RESEND_API_KEY
 # (プロンプトに re_xxxxxxx... のキーをペースト)

@@ -119,6 +119,7 @@ export default {
           subject,
           html,
           text,
+          cc: env.CC_EMAILS ? env.CC_EMAILS.split(',').map(s => s.trim()) : undefined,
           reply_to: fields.email || undefined,
         }),
       });
