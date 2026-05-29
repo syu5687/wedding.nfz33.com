@@ -276,7 +276,7 @@
     const successBox = document.getElementById('formSuccess');
     
     // Cloudflare Worker のエンドポイント (本番デプロイ後に実URLに置換)
-    const ENDPOINT = 'https://rcs-form.linkup-mng.workers.dev/';
+    const ENDPOINT = 'https://rcs-form.mk-cbe.workers.dev/';
     
     function showError(msg){
       errorBox.textContent = msg;
